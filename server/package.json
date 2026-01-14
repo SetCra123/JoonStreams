@@ -1,4 +1,13 @@
 {
+  "name": "server",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "watch": "nodemon",
+    "seed": "node seeds/seeds.js"
+  },
+  
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
