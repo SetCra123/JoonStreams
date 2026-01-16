@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
 const {
   getAllVideos,
   getVideoById,
@@ -10,7 +9,8 @@ const {
   createVideo,
   updateVideo,
   deleteVideo,
-} = require('../controllers/videoController');
+} = require('../../controllers/videoController');
+const { protect, adminOnly } = require('../../middleware/auth');
 
 // Public routes
 router.get('/', getAllVideos);
@@ -20,9 +20,9 @@ router.get('/search', searchVideos);
 router.get('/genre/:genre', getVideosByGenre);
 router.get('/:id', getVideoById);
 
-// Admin routes (add authentication middleware later)
-router.post('/', createVideo);
-router.put('/:id', updateVideo);
-router.delete('/:id', deleteVideo);
+// Admin only routes
+router.post('/', protect, adminOnly, createVideo);
+router.put('/:id', protect, adminOnly, updateVideo);
+router.delete('/:id', protect, adminOnly, deleteVideo);
 
 module.exports = router;
