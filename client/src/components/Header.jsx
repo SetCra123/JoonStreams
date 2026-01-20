@@ -1,11 +1,19 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isAuthenticated, isAdmin } = useAuth();
   
   const isActive = (path) => {
     return location.pathname === path ? 'text-white font-bold' : 'text-gray-300 hover:text-white';
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -14,7 +22,7 @@ function Header() {
         <div className="flex items-center gap-8">
           <Link to="/">
             <h1 className="text-red-600 text-3xl font-bold cursor-pointer hover:text-red-500 transition">
-              STREAMFLIX
+              JOONSTREAMS
             </h1>
           </Link>
           <nav className="flex gap-6 text-sm">
@@ -30,12 +38,41 @@ function Header() {
             <Link to="/browse" className={isActive('/browse')}>
               New & Popular
             </Link>
-            <Link to="/my-list" className={isActive('/my-list')}>
-              My List
-            </Link>
+            {isAuthenticated() && (
+              <Link to="/my-list" className={isActive('/my-list')}>
+                My List
+              </Link>
+            )}
+            {isAdmin() && (
+              <Link to="/admin" className={isActive('/admin')}>
+                Admin
+              </Link>
+            )}
           </nav>
         </div>
-        <div className="w-8 h-8 bg-red-600 rounded"></div>
+
+        <div className="flex items-center gap-4">
+          {isAuthenticated() ? (
+            <>
+              <span className="text-gray-300 text-sm">
+                Hello, {user?.username}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="bg-red-600 px-4 py-2 rounded text-sm hover:bg-red-700 transition"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-red-600 px-4 py-2 rounded text-sm hover:bg-red-700 transition"
+            >
+              Sign In
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );

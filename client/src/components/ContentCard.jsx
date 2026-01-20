@@ -1,8 +1,34 @@
 import React, { useState } from 'react';
-import { Play, Plus, ThumbsUp } from 'lucide-react';
+import { Play, Plus, ThumbsUp, Check } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { userAPI } from '../services/API';
 
 function ContentCard({ item, showProgress, onSelect }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isInList, setIsInList] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  const handleAddToList = async (e) => {
+    e.stopPropagation();
+    
+    if (!isAuthenticated()) {
+      alert('Please login to add to your list');
+      return;
+    }
+
+    try {
+      if (isInList) {
+        await userAPI.removeFromMyList(item._id);
+        setIsInList(false);
+      } else {
+        await userAPI.addToMyList(item._id);
+        setIsInList(true);
+      }
+    } catch (error) {
+      console.error('Error updating list:', error);
+      alert('Failed to update list');
+    }
+  };
 
   return (
     <div 
@@ -12,11 +38,11 @@ function ContentCard({ item, showProgress, onSelect }) {
       onClick={() => onSelect(item)}
     >
       <img 
-        src={item.image} 
+        src={item.thumbnail || item.image} 
         alt={item.title}
         className="w-full h-40 object-cover rounded"
       />
-      {showProgress && (
+      {showProgress && item.progress && (
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700 rounded-b">
           <div 
             className="h-full bg-red-600" 
@@ -31,9 +57,14 @@ function ContentCard({ item, showProgress, onSelect }) {
             <button className="bg-white text-black rounded-full p-2 hover:bg-opacity-80">
               <Play size={16} fill="black" />
             </button>
-            <button className="bg-gray-700 bg-opacity-80 text-white rounded-full p-2 hover:bg-gray-600">
-              <Plus size={16} />
-            </button>
+            {isAuthenticated() && (
+              <button 
+                onClick={handleAddToList}
+                className="bg-gray-700 bg-opacity-80 text-white rounded-full p-2 hover:bg-gray-600"
+              >
+                {isInList ? <Check size={16} /> : <Plus size={16} />}
+              </button>
+            )}
             <button className="bg-gray-700 bg-opacity-80 text-white rounded-full p-2 hover:bg-gray-600">
               <ThumbsUp size={16} />
             </button>
