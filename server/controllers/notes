@@ -24,7 +24,7 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       console.log('Decoded token:', decoded);
 
-      // Check if user or admin
+      // Check if user or admin based on role
       if (decoded.role === 'admin') {
         req.user = await Admin.findById(decoded.id).select('-password');
       } else {
@@ -38,7 +38,7 @@ const protect = async (req, res, next) => {
         console.error('User not found in database for ID:', decoded.id);
         return res.status(401).json({
           success: false,
-          message: 'User not found',
+          message: 'User not found - please register again',
         });
       }
 
@@ -73,3 +73,32 @@ const adminOnly = (req, res, next) => {
 };
 
 module.exports = { protect, adminOnly };
+```
+
+---
+
+## **Solution 4: Clear Browser Storage and Try Again**
+
+Sometimes old tokens cause issues. In your browser:
+
+1. Open DevTools (F12)
+2. Go to **Application** tab
+3. Click **Local Storage**
+4. Click **Clear All**
+5. Refresh the page
+6. Try registering again
+
+---
+
+## **Debugging Steps:**
+
+After making these changes, try registering a new user and check:
+
+**In Server Terminal, you should see:**
+```
+=== REGISTER USER ===
+Registration data: { username: 'testuser', email: 'test@test.com' }
+Hashing password for user: test@test.com
+Password hashed successfully
+User created: 69701921db545cd47cc182cb
+Verified user in DB: { _id: ..., username: ..., email: ... }

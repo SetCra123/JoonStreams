@@ -10,7 +10,7 @@ const {
   updateVideo,
   deleteVideo,
 } = require('../../controllers/videoController');
-const { protect, adminOnly } = require('../../middleware/auth');
+const { protect, adminOnly } = require('../../utils/auth');
 
 // Public routes
 router.get('/', getAllVideos);

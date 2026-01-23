@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ContentRow from '../components/ContentRow';
 import Modal from '../components/Modal';
-// import { mockData } from '../data/mockData';
+import { mockData } from '../data/mockData';
 
 function Browse() {
   const [selectedContent, setSelectedContent] = useState(null);

@@ -15,6 +15,9 @@ const registerUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
+    console.log('=== REGISTER USER ===');
+    console.log('Registration data:', { username, email });
+
     // Check if user exists
     const userExists = await User.findOne({ $or: [{ email }, { username }] });
 
@@ -32,16 +35,31 @@ const registerUser = async (req, res) => {
       password,
     });
 
+    console.log('User created:', user._id);
+
+    // Verify user was saved
+    const savedUser = await User.findById(user._id);
+    console.log('Verified user in DB:', savedUser);
+
+    if (!savedUser) {
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to create user',
+      });
+    }
+
+    
+
     // Generate token
-    const token = generateToken(user._id, user.role);
+    const token = generateToken(savedUser._id, savedUser.role);
 
     res.status(201).json({
       success: true,
       data: {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
+        id: savedUser._id,
+        username: savedUser.username,
+        email: savedUser.email,
+        role: savedUser.role,
         token,
       },
     });
@@ -61,6 +79,9 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log('=== LOGIN USER ===');
+    console.log('Login email:', email);
+
     // Validate input
     if (!email || !password) {
       return res.status(400).json({
@@ -79,6 +100,8 @@ const loginUser = async (req, res) => {
       });
     }
 
+    console.log('User found:', user._id);
+    
     // Check if password matches
     const isMatch = await user.comparePassword(password);
 

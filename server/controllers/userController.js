@@ -5,11 +5,27 @@ const { User, Video } = require('../models');
 // @access  Private
 const addToMyList = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    console.log('=== ADD TO MY LIST ===');
+    console.log('req.user:', req.user);
+    console.log('req.user._id:', req.user?._id);
+    console.log('videoId:', req.params.videoId);
+
+    const user = await User.findById(req.user._id);
     const videoId = req.params.videoId;
+
+    console.log('Found user:', user);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
 
     // Check if video exists
     const video = await Video.findById(videoId);
+    console.log('Found video:', video);
+
     if (!video) {
       return res.status(404).json({
         success: false,
@@ -29,12 +45,16 @@ const addToMyList = async (req, res) => {
     user.myList.push(videoId);
     await user.save();
 
+    console.log('✅ Video added successfully');
+
     res.json({
       success: true,
       message: 'Video added to your list',
       data: user.myList,
     });
   } catch (error) {
+    console.error('❌ Error in addToMyList:', error);
+    console.error('Error stack:', error.stack);
     res.status(500).json({
       success: false,
       message: 'Error adding to list',
@@ -48,12 +68,25 @@ const addToMyList = async (req, res) => {
 // @access  Private
 const removeFromMyList = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    console.log('=== REMOVE FROM MY LIST ===');
+    console.log('req.user._id:', req.user?._id);
+    console.log('videoId:', req.params.videoId);
+
+    const user = await User.findById(req.user._id);
     const videoId = req.params.videoId;
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
 
     // Remove from list
     user.myList = user.myList.filter(id => id.toString() !== videoId);
     await user.save();
+
+    console.log('✅ Video removed successfully');
 
     res.json({
       success: true,
@@ -61,6 +94,7 @@ const removeFromMyList = async (req, res) => {
       data: user.myList,
     });
   } catch (error) {
+    console.error('❌ Error in removeFromMyList:', error);
     res.status(500).json({
       success: false,
       message: 'Error removing from list',
@@ -74,7 +108,21 @@ const removeFromMyList = async (req, res) => {
 // @access  Private
 const getMyList = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate('myList');
+    console.log('=== GET MY LIST ===');
+    console.log('req.user:', req.user);
+    console.log('req.user._id:', req.user?._id);
+
+    const user = await User.findById(req.user._id).populate('myList');
+    
+    console.log('Found user:', user);
+    console.log('User myList:', user?.myList);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
 
     res.json({
       success: true,
@@ -82,6 +130,7 @@ const getMyList = async (req, res) => {
       data: user.myList,
     });
   } catch (error) {
+    console.error('❌ Error in getMyList:', error);
     res.status(500).json({
       success: false,
       message: 'Error getting list',
@@ -95,9 +144,21 @@ const getMyList = async (req, res) => {
 // @access  Private
 const updateWatchProgress = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    console.log('=== UPDATE WATCH PROGRESS ===');
+    console.log('req.user._id:', req.user?._id);
+    console.log('videoId:', req.params.videoId);
+    console.log('progress:', req.body.progress);
+
+    const user = await User.findById(req.user._id);
     const videoId = req.params.videoId;
     const { progress } = req.body; // 0-100
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
 
     // Check if video exists
     const video = await Video.findById(videoId);
@@ -128,11 +189,14 @@ const updateWatchProgress = async (req, res) => {
 
     await user.save();
 
+    console.log('✅ Watch progress updated');
+
     res.json({
       success: true,
       message: 'Watch progress updated',
     });
   } catch (error) {
+    console.error('❌ Error in updateWatchProgress:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating watch progress',
@@ -146,7 +210,19 @@ const updateWatchProgress = async (req, res) => {
 // @access  Private
 const getWatchHistory = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate('watchHistory.video');
+    console.log('=== GET WATCH HISTORY ===');
+    console.log('req.user._id:', req.user?._id);
+
+    const user = await User.findById(req.user._id).populate('watchHistory.video');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    console.log('Watch history count:', user.watchHistory.length);
 
     res.json({
       success: true,
@@ -154,6 +230,7 @@ const getWatchHistory = async (req, res) => {
       data: user.watchHistory,
     });
   } catch (error) {
+    console.error('❌ Error in getWatchHistory:', error);
     res.status(500).json({
       success: false,
       message: 'Error getting watch history',

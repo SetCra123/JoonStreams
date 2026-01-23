@@ -27,7 +27,7 @@ const videoSchema = new Schema (
     genre: {
       type: [String],
       required: true,
-      enum: ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller', 'Documentary', 'Animation'],
+      enum: ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller', 'Documentary', 'Animation', 'Adventure'],
     },
     rating: {
       type: Number,

@@ -18,6 +18,7 @@ app.use(routes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
+  console.log(`${req.method} ${req.url}`);
   res.status(500).json({
     success: false,
     message: 'Something went wrong!',

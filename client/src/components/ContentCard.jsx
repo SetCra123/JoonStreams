@@ -17,22 +17,29 @@ function ContentCard({ item, showProgress, onSelect }) {
     }
 
     try {
+      console.log('Adding to list:', item);
+      console.log('Video ID:', item._id || item.id);
+      
       if (isInList) {
-        await userAPI.removeFromMyList(item._id);
+        const response = await userAPI.removeFromMyList(item._id || item.id);
+        console.log('Remove response:', response);
         setIsInList(false);
       } else {
-        await userAPI.addToMyList(item._id);
+        const response = await userAPI.addToMyList(item._id || item.id);
+        console.log('Add response:', response);
         setIsInList(true);
       }
     } catch (error) {
       console.error('Error updating list:', error);
-      alert('Failed to update list');
+      console.error('Error response:', error.response?.data);
+      alert(error.response?.data?.message || 'Failed to update list');
     }
   };
 
   return (
     <div 
       className="relative flex-shrink-0 w-72 cursor-pointer transition-transform duration-300 hover:scale-105 hover:z-10"
+      style={{ flexShrink: 0, width: '288px' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onSelect(item)}
