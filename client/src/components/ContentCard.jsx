@@ -17,29 +17,27 @@ function ContentCard({ item, showProgress, onSelect }) {
     }
 
     try {
-      console.log('Adding to list:', item);
-      console.log('Video ID:', item._id || item.id);
-      
       if (isInList) {
-        const response = await userAPI.removeFromMyList(item._id || item.id);
-        console.log('Remove response:', response);
+        await userAPI.removeFromMyList(item._id || item.id);
         setIsInList(false);
       } else {
-        const response = await userAPI.addToMyList(item._id || item.id);
-        console.log('Add response:', response);
+        await userAPI.addToMyList(item._id || item.id);
         setIsInList(true);
       }
     } catch (error) {
       console.error('Error updating list:', error);
-      console.error('Error response:', error.response?.data);
       alert(error.response?.data?.message || 'Failed to update list');
     }
+  };
+
+  const handlePlayClick = (e) => {
+    e.stopPropagation();
+    onSelect(item); // This will open the modal, which can then open the player
   };
 
   return (
     <div 
       className="relative flex-shrink-0 w-72 cursor-pointer transition-transform duration-300 hover:scale-105 hover:z-10"
-      style={{ flexShrink: 0, width: '288px' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onSelect(item)}
@@ -61,7 +59,10 @@ function ContentCard({ item, showProgress, onSelect }) {
         <div className="absolute inset-0 bg-black bg-opacity-80 rounded flex flex-col justify-end p-4 transition-opacity duration-300">
           <h3 className="text-white font-bold mb-2">{item.title}</h3>
           <div className="flex gap-2">
-            <button className="bg-white text-black rounded-full p-2 hover:bg-opacity-80">
+            <button 
+              onClick={handlePlayClick}
+              className="bg-white text-black rounded-full p-2 hover:bg-opacity-80"
+            >
               <Play size={16} fill="black" />
             </button>
             {isAuthenticated() && (
